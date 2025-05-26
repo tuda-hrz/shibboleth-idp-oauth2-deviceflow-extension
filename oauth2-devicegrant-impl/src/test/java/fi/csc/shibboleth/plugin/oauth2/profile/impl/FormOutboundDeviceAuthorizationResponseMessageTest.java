@@ -69,7 +69,7 @@ public class FormOutboundDeviceAuthorizationResponseMessageTest {
         profileRequestCtx = new WebflowRequestContextProfileRequestContextLookup().apply(requestCtx);
         profileRequestCtx.setInboundMessageContext(new MessageContext());
         profileRequestCtx.getInboundMessageContext()
-                .setMessage(new OAuth2DeviceAuthorizationRequest(null, new ClientID("clientID"), new Scope("device")));
+                .setMessage(new OAuth2DeviceAuthorizationRequest(null, new ClientID("clientID"), new Scope("device"), null));
         profileRequestCtx.getInboundMessageContext().addSubcontext(new OIDCMetadataContext());
         profileRequestCtx.setOutboundMessageContext(new MessageContext());
         profileRequestCtx.getOutboundMessageContext().addSubcontext(new OIDCAuthenticationResponseContext());

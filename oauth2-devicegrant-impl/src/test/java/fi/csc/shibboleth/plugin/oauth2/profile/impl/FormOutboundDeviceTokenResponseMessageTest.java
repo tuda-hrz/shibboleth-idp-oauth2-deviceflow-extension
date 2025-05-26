@@ -79,7 +79,7 @@ public class FormOutboundDeviceTokenResponseMessageTest {
         deviceCodesCache = new DeviceCodesCache();
         deviceCodesCache.setStorage(storageService);
         deviceCodesCache.initialize();
-        deviceCodesCache.storeDeviceCode(new DeviceCodeObject("DC123456", new ClientID("clientID"), null), "UC123456",
+        deviceCodesCache.storeDeviceCode(new DeviceCodeObject("DC123456", new ClientID("clientID"), null, null), "UC123456",
                 100000);
         expiresAt = System.currentTimeMillis() + 100000;
         deviceCodesCache.updateDeviceState("DC123456", new DeviceStateObject(State.APPROVED, "AT123456", expiresAt),

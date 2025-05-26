@@ -18,6 +18,9 @@ package fi.csc.shibboleth.plugin.oauth2.messaging.impl;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.opensaml.messaging.decoder.MessageDecodingException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -30,6 +33,8 @@ import com.nimbusds.oauth2.sdk.auth.Secret;
 import com.nimbusds.oauth2.sdk.http.HTTPRequest;
 import com.nimbusds.oauth2.sdk.http.HTTPRequest.Method;
 import com.nimbusds.oauth2.sdk.id.ClientID;
+import com.nimbusds.openid.connect.sdk.claims.ACR;
+
 import org.testng.Assert;
 
 /**
@@ -41,8 +46,10 @@ public class OAuth2DeviceAuthorizationRequestTest {
 
     @BeforeMethod
     protected void setUp() throws Exception {
+        ArrayList<ACR> acrs = new ArrayList<ACR>();
+        acrs.add(new ACR("https://refeds"));
         message = new OAuth2DeviceAuthorizationRequest(new URI("http://example.com"), new ClientID("clientID"),
-                new Scope("device"));
+                new Scope("device"), acrs);
     }
 
     @Test
@@ -55,7 +62,7 @@ public class OAuth2DeviceAuthorizationRequestTest {
 
     @Test(expectedExceptions = SerializeException.class)
     public void testNullRequest() throws MessageDecodingException {
-        message = new OAuth2DeviceAuthorizationRequest(null, (ClientID) null, null);
+        message = new OAuth2DeviceAuthorizationRequest(null, (ClientID) null, null, null);
         Assert.assertNull(message.getClientID());
         Assert.assertNull(message.getScope());
         Assert.assertNull(message.getEndpointURI());
@@ -69,16 +76,19 @@ public class OAuth2DeviceAuthorizationRequestTest {
         Assert.assertEquals("http://example.com", req.getURL().toString());
         Assert.assertTrue(req.getQuery().contains("client_id=clientID"));
         Assert.assertTrue(req.getQuery().contains("scope=device"));
+        Assert.assertTrue(req.getQuery().contains("acr_values=https%3A%2F%2Frefeds"));
         OAuth2DeviceAuthorizationRequest messageParsed = OAuth2DeviceAuthorizationRequest.parse(req);
         Assert.assertEquals("clientID", messageParsed.getClientID().getValue());
         Assert.assertEquals("device", messageParsed.getScope().toString());
         Assert.assertEquals("http://example.com", messageParsed.getEndpointURI().toString());
+        Assert.assertTrue("https://refeds".equals(messageParsed.getAcrValues().get(0).getValue()));
     }
 
     @Test
     public void testClientAuthnGetters() throws MessageDecodingException, ParseException, URISyntaxException {
         ClientAuthentication clientAuth = new ClientSecretBasic(new ClientID("clientID"), new Secret());
-        message = new OAuth2DeviceAuthorizationRequest(new URI("http://example.com"), clientAuth, new Scope("device"));
+        message = new OAuth2DeviceAuthorizationRequest(new URI("http://example.com"), clientAuth, new Scope("device"),
+                null);
         Assert.assertNull(message.getClientID());
         Assert.assertEquals("device", message.getScope().toString());
         Assert.assertEquals("clientID", message.getClientAuthentication().getClientID().getValue());
@@ -89,7 +99,8 @@ public class OAuth2DeviceAuthorizationRequestTest {
     public void testClientAuthnHttpRequestAndParse()
             throws MessageDecodingException, ParseException, URISyntaxException {
         ClientAuthentication clientAuth = new ClientSecretBasic(new ClientID("clientID"), new Secret());
-        message = new OAuth2DeviceAuthorizationRequest(new URI("http://example.com"), clientAuth, new Scope("device"));
+        message = new OAuth2DeviceAuthorizationRequest(new URI("http://example.com"), clientAuth, new Scope("device"),
+                null);
         HTTPRequest req = message.toHTTPRequest();
         Assert.assertEquals(Method.POST, req.getMethod());
         Assert.assertEquals("http://example.com", req.getURL().toString());

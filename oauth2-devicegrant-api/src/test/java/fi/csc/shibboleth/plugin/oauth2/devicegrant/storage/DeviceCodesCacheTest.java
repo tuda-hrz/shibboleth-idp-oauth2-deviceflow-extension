@@ -56,7 +56,7 @@ public class DeviceCodesCacheTest {
         deviceCodesCache.initialize();
 
         deviceCodeObject =
-                new DeviceCodeObject("device_code_XYZ", new ClientID("client_id_XYZ"), new Scope("device_scope"));
+                new DeviceCodeObject("device_code_XYZ", new ClientID("client_id_XYZ"), new Scope("device_scope"), null);
     }
 
     @AfterMethod

@@ -16,10 +16,17 @@
 
 package fi.csc.shibboleth.plugin.oauth2.devicegrant.storage;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.id.ClientID;
+import com.nimbusds.openid.connect.sdk.claims.ACR;
+
 import net.minidev.json.JSONObject;
 
 /** Class wraps device code information for serialization. */
@@ -37,20 +44,26 @@ public class DeviceCodeObject {
     @Nullable
     private final Scope scope;
 
+    /** The acr values of the access request. */
+    @Nullable
+    private final List<ACR> acrValues;
+
     /**
      * Constructor.
      * 
      * @param deviceCode Device Code
-     * @param clientID Client ID of the relying party
-     * @param scope Scope of the request
+     * @param clientID   Client ID of the relying party
+     * @param scope      Scope of the request @
      */
-    public DeviceCodeObject(@Nonnull String deviceCode, @Nonnull ClientID clientID, @Nullable Scope scope) {
+    public DeviceCodeObject(@Nonnull String deviceCode, @Nonnull ClientID clientID, @Nullable Scope scope,
+            @Nullable List<ACR> acrValues) {
         if (deviceCode == null || clientID == null) {
             throw new IllegalArgumentException("device code and client id must not be null");
         }
         this.deviceCode = deviceCode;
         this.clientID = clientID;
         this.scope = scope;
+        this.acrValues = acrValues;
     }
 
     /**
@@ -84,6 +97,15 @@ public class DeviceCodeObject {
     }
 
     /**
+     * Get the acr values of the access request.
+     * 
+     * @return The acr values of the access request.
+     */
+    public List<ACR> getAcrValues() {
+        return acrValues;
+    }
+
+    /**
      * Wraps Device Code, Client ID and scope to a JSON Object.
      * 
      * @return JSON Object representing the class information.
@@ -95,6 +117,9 @@ public class DeviceCodeObject {
         object.put("client_id", clientID.getValue());
         if (scope != null) {
             object.put("scope", scope.toString());
+        }
+        if (acrValues != null) {
+            object.put("acr_values", acrValues.stream().map(String::valueOf).collect(Collectors.joining(" ")));
         }
         return object;
     }
@@ -109,9 +134,16 @@ public class DeviceCodeObject {
         if (deviceCodeObject == null) {
             throw new IllegalArgumentException("device code object must not be null");
         }
+        final List<ACR> acrValues = new ArrayList<ACR>();
+        String acrValuesRaw = deviceCodeObject.getAsString("acr_values");
+        if (acrValuesRaw != null && !acrValuesRaw.isBlank()) {
+            Arrays.asList(acrValuesRaw.split(" ")).forEach(acr -> {
+                acrValues.add(new ACR(acr));
+            });
+        }
         return new DeviceCodeObject(deviceCodeObject.getAsString("device_code"),
                 new ClientID(deviceCodeObject.getAsString("client_id")),
-                Scope.parse(deviceCodeObject.getAsString("scope")));
+                Scope.parse(deviceCodeObject.getAsString("scope")), acrValues.isEmpty() ? null : acrValues);
     }
 
 }
