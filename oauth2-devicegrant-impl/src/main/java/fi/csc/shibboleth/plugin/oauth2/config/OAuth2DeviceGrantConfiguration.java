@@ -17,6 +17,7 @@
 package fi.csc.shibboleth.plugin.oauth2.config;
 
 import java.time.Duration;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,7 +26,9 @@ import org.opensaml.profile.context.ProfileRequestContext;
 
 import net.shibboleth.profile.config.ConditionalProfileConfiguration;
 import net.shibboleth.shared.annotation.ConfigurationSetting;
+import net.shibboleth.shared.annotation.constraint.NonnullElements;
 import net.shibboleth.shared.annotation.constraint.NotEmpty;
+import net.shibboleth.shared.annotation.constraint.NotLive;
 import net.shibboleth.shared.annotation.constraint.Positive;
 
 /**
@@ -106,4 +109,12 @@ public interface OAuth2DeviceGrantConfiguration extends ConditionalProfileConfig
     @Positive
     @Nonnull
     Duration getDeviceCodeLifetime(@Nullable final ProfileRequestContext profileRequestContext);
+    
+    /**
+     * 
+     * @param profileRequestContext
+     * @return
+     */
+    @Nonnull @NonnullElements @NotLive public Set<String> getAdditionalAudiencesForAccessToken(
+            @Nullable final ProfileRequestContext profileRequestContext);
 }
