@@ -42,6 +42,15 @@
 	<bean id="InitializeAuthenticationContext"
 		class="fi.csc.shibboleth.plugin.oauth2.profile.impl.InitializeAuthenticationContext"
 		scope="prototype" />
+		
+    <bean id="ProcessRequestedAuthnContext"
+        class="net.shibboleth.idp.plugin.oidc.op.profile.impl.ProcessRequestedAuthnContext" scope="prototype"
+        p:acrAlwaysEssentialLookupStrategy-ref="shibboleth.Conditions.TRUE">
+        <property name="acrLookupStrategy">
+            <bean class="fi.csc.shibboleth.plugin.oauth2.devicegrant.profile.context.navigate.DeviceACRLookupFunction"
+                p:deviceCodesCache-ref="shibboleth.DeviceCodesCache"/>
+        </property>
+    </bean>
 
 	<bean id="PopulateUserAgentContext"
 		class="net.shibboleth.idp.profile.impl.PopulateUserAgentContext"

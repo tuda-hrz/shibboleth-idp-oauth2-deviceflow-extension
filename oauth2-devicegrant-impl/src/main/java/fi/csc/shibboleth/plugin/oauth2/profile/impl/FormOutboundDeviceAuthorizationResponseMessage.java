@@ -226,7 +226,7 @@ public class FormOutboundDeviceAuthorizationResponseMessage extends AbstractOIDC
         userCode = userCode.substring(1, (int) userCodeLength + 1);
         String rpId = rpCtx.getRelyingPartyId();
         DeviceCodeObject deviceCodeObject = new DeviceCodeObject(deviceCode, new ClientID(rpId),
-                new Scope(request.getScope()));
+                new Scope(request.getScope()), request.getAcrValues());
         try {
             log.debug("Storing device flow device code object {} per user code {}",
                     deviceCodeObject.toJSONObject().toString(), userCode);

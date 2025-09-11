@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2024 CSC- IT Center for Science, www.csc.fi
+ * Copyright (c) 2019-2025 CSC- IT Center for Science, www.csc.fi
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -42,6 +44,10 @@ import com.nimbusds.oauth2.sdk.util.MultivaluedMapUtils;
 import com.nimbusds.oauth2.sdk.util.StringUtils;
 import com.nimbusds.oauth2.sdk.util.URLUtils;
 
+import com.nimbusds.openid.connect.sdk.claims.ACR;
+
+import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
+
 /**
  * Class implementing Authorization Request message as described in
  * https://tools.ietf.org/html/rfc8628#section-3.1.
@@ -52,30 +58,40 @@ public class OAuth2DeviceAuthorizationRequest extends AbstractOptionallyIdentifi
     @Nullable
     private final Scope scope;
 
+    /** OPTIONAL. The acr values of the access request. */
+    @Nullable
+    private final List<ACR> acrValues;
+
     /**
      * Constructor.
      * 
-     * @param uri The URI of the endpoint (HTTP or HTTPS) for which the request is intended, {@code null} if not
-     *            specified (if, for example, the {@link #toHTTPRequest()} method will not be used).
+     * @param uri        The URI of the endpoint (HTTP or HTTPS) for which the
+     *                   request is intended, {@code null} if not specified (if, for
+     *                   example, the {@link #toHTTPRequest()} method will not be
+     *                   used).
      * @param clientAuth The client authentication, {@code null} if none.
-     * @param scope The scope of the access request, {@code null} if none.
+     * @param scope      The scope of the access request, {@code null} if none.
      */
-    public OAuth2DeviceAuthorizationRequest(final URI uri, ClientAuthentication clientAuth, Scope scope) {
+    public OAuth2DeviceAuthorizationRequest(final URI uri, ClientAuthentication clientAuth, Scope scope,
+            List<ACR> acrValues) {
         super(uri, clientAuth);
         this.scope = scope;
+        this.acrValues = acrValues;
     }
 
     /**
      * Constructor.
      * 
-     * @param uri The URI of the endpoint (HTTP or HTTPS) for which the request is intended, {@code null} if not
-     *            specified (if, for example, the {@link #toHTTPRequest()} method will not be used).
+     * @param uri      The URI of the endpoint (HTTP or HTTPS) for which the request
+     *                 is intended, {@code null} if not specified (if, for example,
+     *                 the {@link #toHTTPRequest()} method will not be used).
      * @param clientID The client identifier, {@code null} if not specified.
-     * @param scope The scope of the access request, {@code null} if none.
+     * @param scope    The scope of the access request, {@code null} if none.
      */
-    public OAuth2DeviceAuthorizationRequest(final URI uri, ClientID clientID, Scope scope) {
+    public OAuth2DeviceAuthorizationRequest(final URI uri, ClientID clientID, Scope scope, List<ACR> acrValues) {
         super(uri, clientID);
         this.scope = scope;
+        this.acrValues = acrValues;
     }
 
     /**
@@ -86,6 +102,16 @@ public class OAuth2DeviceAuthorizationRequest extends AbstractOptionallyIdentifi
     @Nullable
     public Scope getScope() {
         return scope;
+    }
+
+    /**
+     * Get he acr values of the access request.
+     * 
+     * @return The acr values of the access request
+     */
+    @Nullable
+    public List<ACR> getAcrValues() {
+        return acrValues;
     }
 
     /**
@@ -108,6 +134,15 @@ public class OAuth2DeviceAuthorizationRequest extends AbstractOptionallyIdentifi
         if (getClientID() != null) {
             // public client
             params.put("client_id", Collections.singletonList(getClientID().getValue()));
+        }
+        if (acrValues != null) {
+            StringBuilder sb = new StringBuilder();
+            for (ACR acr: acrValues) {
+                if (sb.length() > 0)
+                    sb.append(' ');
+                sb.append(acr.toString());
+            }
+            params.put("acr_values", Collections.singletonList(sb.toString()));
         }
         if (scope != null && !scope.isEmpty()) {
             params.put("scope", Collections.singletonList(scope.toString()));
@@ -144,6 +179,17 @@ public class OAuth2DeviceAuthorizationRequest extends AbstractOptionallyIdentifi
                 throw new ParseException(msg, OAuth2Error.INVALID_REQUEST.appendDescription(": " + msg));
             }
         }
+        String acrParameterValue = MultivaluedMapUtils.getFirstValue(params, "acr_values");
+
+        List<ACR> acrValues = null;
+        if (StringUtils.isNotBlank(acrParameterValue)) {
+            acrValues = new LinkedList<>();
+            StringTokenizer st = new StringTokenizer(acrParameterValue, " ");
+            while (st.hasMoreTokens()) {
+                acrValues.add(new ACR(st.nextToken()));
+            }
+        }
+
         String scopeValue = MultivaluedMapUtils.getFirstValue(params, "scope");
         Scope scope = null;
         if (scopeValue != null) {
@@ -156,14 +202,14 @@ public class OAuth2DeviceAuthorizationRequest extends AbstractOptionallyIdentifi
             throw new ParseException(e.getMessage(), e);
         }
         if (clientAuth != null) {
-            return new OAuth2DeviceAuthorizationRequest(uri, clientAuth, scope);
+            return new OAuth2DeviceAuthorizationRequest(uri, clientAuth, scope, acrValues);
         }
         final String clientIDString = MultivaluedMapUtils.getFirstValue(params, "client_id");
         if (StringUtils.isBlank(clientIDString)) {
             throw new ParseException(
                     "Invalid device flow authorization request: No client authentication or client_id parameter found");
         }
-        return new OAuth2DeviceAuthorizationRequest(uri, new ClientID(clientIDString), scope);
+        return new OAuth2DeviceAuthorizationRequest(uri, new ClientID(clientIDString), scope, acrValues);
     }
 
 }

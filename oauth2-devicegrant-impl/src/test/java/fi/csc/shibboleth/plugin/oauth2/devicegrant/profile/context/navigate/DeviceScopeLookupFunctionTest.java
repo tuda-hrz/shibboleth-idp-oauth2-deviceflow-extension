@@ -58,13 +58,13 @@ public class DeviceScopeLookupFunctionTest {
         storage.initialize();
         cache.setStorage(storage);
         cache.initialize();
-        cache.storeDeviceCode(new DeviceCodeObject("DC1234", new ClientID("clientID4"), new Scope("device1")), "UC1234",
+        cache.storeDeviceCode(new DeviceCodeObject("DC1234", new ClientID("clientID4"), new Scope("device1"), null), "UC1234",
                 100);
-        cache.storeDeviceCode(new DeviceCodeObject("DC12345", new ClientID("clientID5"), new Scope("device2")),
+        cache.storeDeviceCode(new DeviceCodeObject("DC12345", new ClientID("clientID5"), new Scope("device2"), null),
                 "UC12345", 100);
-        cache.storeDeviceCode(new DeviceCodeObject("DC123456", new ClientID("clientID6"), new Scope("device3")),
+        cache.storeDeviceCode(new DeviceCodeObject("DC123456", new ClientID("clientID6"), new Scope("device3"), null),
                 "UC123456", 100);
-        cache.storeDeviceCode(new DeviceCodeObject("DC1234567", new ClientID("clientID7"), new Scope("device4")),
+        cache.storeDeviceCode(new DeviceCodeObject("DC1234567", new ClientID("clientID7"), new Scope("device4"), null),
                 "UC1234567", 100);
         lookup.setDeviceCodesCache(cache);
         lookup.initialize();

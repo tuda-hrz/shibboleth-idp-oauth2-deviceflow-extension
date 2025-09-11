@@ -19,6 +19,7 @@ package fi.csc.shibboleth.plugin.oauth2.profile.impl;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -30,7 +31,6 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.nimbusds.oauth2.sdk.Scope;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.openid.connect.sdk.claims.ClaimsSet;
 
@@ -149,6 +149,8 @@ public class StoreDeviceState extends AbstractOIDCResponseAction {
     /** Strategy to locate user approval. */
     @Nonnull
     private Function<MessageContext, Boolean> userApprovalLookupStrategy;
+
+    Set<String> audiences;
 
     /**
      * Constructor.
@@ -327,8 +329,11 @@ public class StoreDeviceState extends AbstractOIDCResponseAction {
         }
         final ProfileConfiguration pc = rpCtx.getProfileConfig();
         if (pc != null && pc instanceof OAuth2DeviceGrantConfiguration) {
-            accessTokenLifetime = ((OAuth2AccessTokenProducingProfileConfiguration) pc).getAccessTokenLifetime(profileRequestContext);
+            accessTokenLifetime = ((OAuth2AccessTokenProducingProfileConfiguration) pc)
+                    .getAccessTokenLifetime(profileRequestContext);
             expiration = ((OAuth2DeviceGrantConfiguration) pc).getDeviceCodeLifetime(profileRequestContext);
+            audiences = ((OAuth2DeviceGrantConfiguration) pc)
+                    .getAdditionalAudiencesForAccessToken(profileRequestContext);
         } else {
             log.error("{} No oidc profile configuration associated with this profile request", getLogPrefix());
             ActionSupport.buildEvent(profileRequestContext, IdPEventIds.INVALID_RELYING_PARTY_CTX);
@@ -376,7 +381,7 @@ public class StoreDeviceState extends AbstractOIDCResponseAction {
             try {
                 claimsSet = new AccessTokenClaimsSet.Builder().setJWTID(idGenerator)
                         .setACR(getOidcResponseContext().getAcr()).setClientID(new ClientID(rpCtx.getRelyingPartyId()))
-                        .setIssuer(issuerLookupStrategy.apply(profileRequestContext))
+                        .setIssuer(issuerLookupStrategy.apply(profileRequestContext)).setAudience(audiences)
                         .setPrincipal(subjectCtx.getPrincipalName()).setSubject(getOidcResponseContext().getSubject())
                         .setIssuedAt(Instant.now()).setExpiresAt(dateExp).setACR(getOidcResponseContext().getAcr())
                         .setAuthenticationTime(getOidcResponseContext().getAuthTime())

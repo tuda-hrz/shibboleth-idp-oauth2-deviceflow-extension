@@ -104,7 +104,7 @@ public class StoreDeviceStateTest {
         deviceCodesCache = new DeviceCodesCache();
         deviceCodesCache.setStorage(storageService);
         deviceCodesCache.initialize();
-        deviceCodesCache.storeDeviceCode(new DeviceCodeObject("DC123456", new ClientID("clientID"), null), "UC123456",
+        deviceCodesCache.storeDeviceCode(new DeviceCodeObject("DC123456", new ClientID("clientID"), null, null), "UC123456",
                 100000);
         action = new StoreDeviceState(getDataSealer());
         action.setDeviceCodesCache(deviceCodesCache);

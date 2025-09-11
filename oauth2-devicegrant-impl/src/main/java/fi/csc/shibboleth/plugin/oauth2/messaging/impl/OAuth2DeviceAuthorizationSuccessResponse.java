@@ -187,9 +187,9 @@ public class OAuth2DeviceAuthorizationSuccessResponse implements SuccessResponse
         if (verificationURIComplete != null) {
             content.put("verification_uri_complete", verificationURIComplete.toString());
         }
-        content.put("expires_in", expiresIn.toString());
+        content.put("expires_in", expiresIn);
         if (interval != null) {
-            content.put("interval", interval.toString());
+            content.put("interval", interval);
         }
         return content;
     }

@@ -17,7 +17,9 @@
 package fi.csc.shibboleth.plugin.oauth2.config.impl;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -29,8 +31,11 @@ import org.opensaml.profile.context.ProfileRequestContext;
 import fi.csc.shibboleth.plugin.oauth2.config.OAuth2DeviceGrantConfiguration;
 import net.shibboleth.oidc.profile.oauth2.config.OAuth2AccessTokenProducingProfileConfiguration;
 import net.shibboleth.profile.config.OverriddenIssuerProfileConfiguration;
+import net.shibboleth.shared.annotation.constraint.NonnullElements;
 import net.shibboleth.shared.annotation.constraint.NotEmpty;
+import net.shibboleth.shared.annotation.constraint.NotLive;
 import net.shibboleth.shared.annotation.constraint.Positive;
+import net.shibboleth.shared.collection.CollectionSupport;
 import net.shibboleth.shared.logic.Constraint;
 import net.shibboleth.shared.logic.FunctionSupport;
 import net.shibboleth.shared.primitive.StringSupport;
@@ -73,6 +78,9 @@ public class DefaultOAuth2DeviceGrantConfiguration extends AbstractOAuth2ClientA
     /** Lookup function to supply polling interval. */
     @Nonnull
     private Function<ProfileRequestContext, Duration> pollingIntervalLookupStrategy;
+    
+    /** Lookup function to supply additional audiences for ID token. */
+    @Nonnull private Function<ProfileRequestContext,Set<String>> assertionAudiencesLookupStrategy;
 
     /**
      * Constructor.
@@ -87,6 +95,7 @@ public class DefaultOAuth2DeviceGrantConfiguration extends AbstractOAuth2ClientA
         deviceCodeLengthLookupStrategy = FunctionSupport.constant(Integer.valueOf(16));
         userCodeLengthLookupStrategy = FunctionSupport.constant(Integer.valueOf(8));
         pollingIntervalLookupStrategy = FunctionSupport.constant(Duration.ofSeconds(5));
+        assertionAudiencesLookupStrategy = FunctionSupport.constant(null);
     }
 
     @Override
@@ -330,5 +339,44 @@ public class DefaultOAuth2DeviceGrantConfiguration extends AbstractOAuth2ClientA
     public void setIssuerLookupStrategy(@Nonnull final Function<ProfileRequestContext, String> strategy) {
         issuerLookupStrategy = Constraint.isNotNull(strategy, "Issuer lookup strategy cannot be null");
     }
+
+    /** {@inheritDoc} */
+   @Override
+   @Nonnull @NonnullElements @NotLive public Set<String> getAdditionalAudiencesForAccessToken(
+           @Nullable final ProfileRequestContext profileRequestContext) {
+       
+       final Set<String> audiences = assertionAudiencesLookupStrategy.apply(profileRequestContext);
+       if (audiences != null) {
+           return CollectionSupport.copyToSet(audiences);
+       }
+       return CollectionSupport.emptySet();
+   }
+
+   /**
+    * Set the set of audiences, in addition to the relying party(ies) to which the IdP is issuing the ID Token, with
+    * which the token may be shared.
+    * 
+    * @param audiences the additional audiences
+    */
+   public void setAdditionalAudiencesForAccessToken(@Nullable @NonnullElements final Collection<String> audiences) {
+
+       if (audiences == null || audiences.isEmpty()) {
+           assertionAudiencesLookupStrategy = FunctionSupport.constant(null);
+       } else {
+           assertionAudiencesLookupStrategy = FunctionSupport.constant(
+                   Set.copyOf(StringSupport.normalizeStringCollection(audiences)));
+       }
+   }
+
+   /**
+    * Set a lookup strategy for the set of audiences, in addition to the relying party(ies) to which the IdP
+    * is issuing the ID Token, with which the token may be shared.
+    *
+    * @param strategy  lookup strategy
+    */
+   public void setAdditionalAudiencesForIdTokenLookupStrategy(
+           @Nonnull final Function<ProfileRequestContext,Set<String>> strategy) {
+       assertionAudiencesLookupStrategy = Constraint.isNotNull(strategy, "Lookup strategy cannot be null");
+   }
 
 }

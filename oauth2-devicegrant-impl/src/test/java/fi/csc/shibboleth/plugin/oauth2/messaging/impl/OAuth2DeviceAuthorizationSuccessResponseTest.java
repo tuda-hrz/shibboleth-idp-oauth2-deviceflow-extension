@@ -80,8 +80,8 @@ public class OAuth2DeviceAuthorizationSuccessResponseTest {
         Assert.assertEquals("userCode", response.get("user_code"));
         Assert.assertEquals("http;//example.com", response.get("verification_uri"));
         Assert.assertEquals("http;//example.com/complete", response.get("verification_uri_complete"));
-        Assert.assertEquals(60L, response.getAsNumber("expires_in"));
-        Assert.assertEquals(10L, response.getAsNumber("interval"));
+        Assert.assertEquals(60, response.get("expires_in"));
+        Assert.assertEquals(10, response.get("interval"));
     }
 
     @Test
