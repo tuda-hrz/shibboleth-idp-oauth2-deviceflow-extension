@@ -45,6 +45,10 @@
     </dependency>
     <dependency>
       <groupId>net.shibboleth.oidc</groupId>
+      <artifactId>oidc-common-profile-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.shibboleth.oidc</groupId>
       <artifactId>oidc-common-profile-api</artifactId>
       <scope>provided</scope>
     </dependency>

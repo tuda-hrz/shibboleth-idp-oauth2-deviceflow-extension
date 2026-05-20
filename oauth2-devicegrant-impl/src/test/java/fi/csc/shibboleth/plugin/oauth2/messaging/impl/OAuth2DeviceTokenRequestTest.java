@@ -50,7 +50,8 @@ public class OAuth2DeviceTokenRequestTest {
         Assert.assertEquals("123456", message.getDeviceCode());
         Assert.assertEquals(OAuth2DeviceTokenRequest.grantTypeValue, message.getGrantType());
         Assert.assertNull(message.getClientAuthentication());
-        Assert.assertEquals("http://example.com", message.getEndpointURI().toString());
+        Assert.assertEquals("example.com", message.getEndpointURI().getHost());
+        Assert.assertEquals("http", message.getEndpointURI().getScheme());
     }
 
     @Test(expectedExceptions = SerializeException.class)
@@ -80,15 +81,17 @@ public class OAuth2DeviceTokenRequestTest {
     public void testHttpRequestAndParse() throws MessageDecodingException, ParseException {
         HTTPRequest req = message.toHTTPRequest();
         Assert.assertEquals(Method.POST, req.getMethod());
-        Assert.assertEquals("http://example.com", req.getURL().toString());
-        Assert.assertTrue(req.getQuery().contains("device_code=123456"));
-        Assert.assertTrue(req.getQuery()
+        Assert.assertEquals("http", req.getURL().getProtocol());
+        Assert.assertEquals("example.com", req.getURL().getHost());
+        Assert.assertTrue(req.getURL().getQuery().contains("device_code=123456"));
+        Assert.assertTrue(req.getURL().getQuery()
                 .contains("grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code&device_code"));;
         OAuth2DeviceTokenRequest messageParsed = OAuth2DeviceTokenRequest.parse(req);
         Assert.assertEquals("clientID", messageParsed.getClientID().getValue());
         Assert.assertEquals("123456", messageParsed.getDeviceCode());
         Assert.assertEquals(OAuth2DeviceTokenRequest.grantTypeValue, messageParsed.getGrantType());
-        Assert.assertEquals("http://example.com", messageParsed.getEndpointURI().toString());
+        Assert.assertEquals("example.com", messageParsed.getEndpointURI().getHost());
+        Assert.assertEquals("http", messageParsed.getEndpointURI().getScheme());
     }
 
     @Test
@@ -100,7 +103,8 @@ public class OAuth2DeviceTokenRequestTest {
         Assert.assertEquals("123456", message.getDeviceCode());
         Assert.assertEquals(OAuth2DeviceTokenRequest.grantTypeValue, message.getGrantType());
         Assert.assertEquals("clientID", message.getClientAuthentication().getClientID().getValue());
-        Assert.assertEquals("http://example.com", message.getEndpointURI().toString());
+        Assert.assertEquals("example.com", message.getEndpointURI().getHost());
+        Assert.assertEquals("http", message.getEndpointURI().getScheme());
     }
 
     @Test
@@ -111,9 +115,10 @@ public class OAuth2DeviceTokenRequestTest {
                 OAuth2DeviceTokenRequest.grantTypeValue, "123456");
         HTTPRequest req = message.toHTTPRequest();
         Assert.assertEquals(Method.POST, req.getMethod());
-        Assert.assertEquals("http://example.com", req.getURL().toString());
-        Assert.assertTrue(req.getQuery().contains("device_code=123456"));
-        Assert.assertTrue(req.getQuery()
+        Assert.assertEquals("http", req.getURL().getProtocol());
+        Assert.assertEquals("example.com", req.getURL().getHost());
+        Assert.assertTrue(req.getURL().getQuery().contains("device_code=123456"));
+        Assert.assertTrue(req.getURL().getQuery()
                 .contains("grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code&device_code"));;
         Assert.assertNotNull(req.getHeaderValue("Authorization"));
         OAuth2DeviceTokenRequest messageParsed = OAuth2DeviceTokenRequest.parse(req);
@@ -121,7 +126,8 @@ public class OAuth2DeviceTokenRequestTest {
         Assert.assertEquals("123456", messageParsed.getDeviceCode());
         Assert.assertEquals(OAuth2DeviceTokenRequest.grantTypeValue, messageParsed.getGrantType());
         Assert.assertEquals("clientID", messageParsed.getClientAuthentication().getClientID().getValue());
-        Assert.assertEquals("http://example.com", messageParsed.getEndpointURI().toString());
+        Assert.assertEquals("example.com", messageParsed.getEndpointURI().getHost());
+        Assert.assertEquals("http", messageParsed.getEndpointURI().getScheme());
     }
 
 }

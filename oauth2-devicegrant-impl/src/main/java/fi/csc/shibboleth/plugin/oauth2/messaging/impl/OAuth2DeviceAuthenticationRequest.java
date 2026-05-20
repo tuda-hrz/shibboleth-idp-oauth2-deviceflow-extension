@@ -90,7 +90,7 @@ public class OAuth2DeviceAuthenticationRequest extends AbstractRequest {
         params.putAll(URLUtils.parseParameters(getEndpointURI().getQuery()));
         if (user_code != null) {
             params.put("user_code", Arrays.asList(user_code));
-            httpRequest.setQuery(URLUtils.serializeParameters(params));
+            httpRequest.appendQueryParameters(params);
         }
         return httpRequest;
     }
@@ -131,7 +131,7 @@ public class OAuth2DeviceAuthenticationRequest extends AbstractRequest {
      */
     public static OAuth2DeviceAuthenticationRequest parse(final HTTPRequest httpRequest) throws ParseException {
 
-        String query = httpRequest.getQuery();
+        String query = httpRequest.getURL().getQuery();
         URI endpointURI;
         try {
             endpointURI = httpRequest.getURL().toURI();

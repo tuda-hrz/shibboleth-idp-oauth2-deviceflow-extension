@@ -56,7 +56,7 @@ public final class RequestUtil {
                 ret += "\t" + entry.getKey() + ":" + entry.getValue() + nl;
             }
         }
-        final Map<String, List<String>> parameters = httpReq.getQueryParameters();
+        final Map<String, List<String>> parameters = httpReq.getQueryStringParameters();
         if (parameters != null) {
             ret += "Parameters:" + nl;
             for (final Entry<String, List<String>> entry : parameters.entrySet()) {

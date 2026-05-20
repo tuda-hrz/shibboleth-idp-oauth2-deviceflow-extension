@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -30,6 +31,7 @@ import org.opensaml.profile.context.ProfileRequestContext;
 
 import fi.csc.shibboleth.plugin.oauth2.config.OAuth2DeviceGrantConfiguration;
 import net.shibboleth.oidc.profile.oauth2.config.OAuth2AccessTokenProducingProfileConfiguration;
+import net.shibboleth.oidc.profile.oauth2.config.impl.AbstractOAuth2ClientAuthenticableProfileConfiguration;
 import net.shibboleth.profile.config.OverriddenIssuerProfileConfiguration;
 import net.shibboleth.shared.annotation.constraint.NonnullElements;
 import net.shibboleth.shared.annotation.constraint.NotEmpty;
@@ -38,6 +40,7 @@ import net.shibboleth.shared.annotation.constraint.Positive;
 import net.shibboleth.shared.collection.CollectionSupport;
 import net.shibboleth.shared.logic.Constraint;
 import net.shibboleth.shared.logic.FunctionSupport;
+import net.shibboleth.shared.logic.PredicateSupport;
 import net.shibboleth.shared.primitive.StringSupport;
 
 public class DefaultOAuth2DeviceGrantConfiguration extends AbstractOAuth2ClientAuthenticableProfileConfiguration
@@ -82,6 +85,10 @@ public class DefaultOAuth2DeviceGrantConfiguration extends AbstractOAuth2ClientA
     /** Lookup function to supply additional audiences for ID token. */
     @Nonnull private Function<ProfileRequestContext,Set<String>> assertionAudiencesLookupStrategy;
 
+    /** Whether the access token to be issued is always a bearer access token. */
+    @Nonnull
+    private Predicate<ProfileRequestContext> alwaysIssueBearerAccessTokenPredicate;
+
     /**
      * Constructor.
      */
@@ -96,6 +103,7 @@ public class DefaultOAuth2DeviceGrantConfiguration extends AbstractOAuth2ClientA
         userCodeLengthLookupStrategy = FunctionSupport.constant(Integer.valueOf(8));
         pollingIntervalLookupStrategy = FunctionSupport.constant(Duration.ofSeconds(5));
         assertionAudiencesLookupStrategy = FunctionSupport.constant(null);
+        alwaysIssueBearerAccessTokenPredicate = PredicateSupport.alwaysFalse();
     }
 
     @Override
@@ -379,4 +387,32 @@ public class DefaultOAuth2DeviceGrantConfiguration extends AbstractOAuth2ClientA
        assertionAudiencesLookupStrategy = Constraint.isNotNull(strategy, "Lookup strategy cannot be null");
    }
 
+   @Override
+   public boolean isAlwaysIssueBearerAccessToken(@Nullable final ProfileRequestContext profileRequestContext) {
+       return alwaysIssueBearerAccessTokenPredicate.test(profileRequestContext);
+   }
+
+   /**
+    * Set whether the access token to be issued is always a bearer access token.
+    *
+    * @param flag flag to set
+    *
+    * @since 3.2.0
+    */
+   public void setAlwaysIssueBearerAccessToken(final boolean flag) {
+       alwaysIssueBearerAccessTokenPredicate = flag ? PredicateSupport.alwaysTrue() : PredicateSupport.alwaysFalse();
+   }
+
+   /**
+    * Set a condition to determine whether the access token to be issued is always
+    * a bearer access token.
+    *
+    * @param condition condition to set
+    *
+    * @since 3.2.0
+    */
+   public void setAlwaysIssueBearerAccessTokenPredicate(@Nonnull final Predicate<ProfileRequestContext> condition) {
+       alwaysIssueBearerAccessTokenPredicate = Constraint.isNotNull(condition,
+               "Always issue bearer access token predicate cannot be null");
+   }
 }

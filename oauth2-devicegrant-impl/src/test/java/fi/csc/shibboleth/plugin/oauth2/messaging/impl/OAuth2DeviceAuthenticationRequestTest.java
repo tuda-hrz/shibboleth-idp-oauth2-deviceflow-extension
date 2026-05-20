@@ -59,11 +59,13 @@ public class OAuth2DeviceAuthenticationRequestTest {
     public void testHttpRequestAndParse() throws MessageDecodingException, ParseException {
         HTTPRequest req = message.toHTTPRequest();
         Assert.assertEquals(Method.GET, req.getMethod());
-        Assert.assertEquals("http://example.com", req.getURL().toString());
-        Assert.assertEquals("user_code=123456", req.getQuery());
+        Assert.assertEquals("http", req.getURL().getProtocol());
+        Assert.assertEquals("example.com", req.getURL().getHost());
+        Assert.assertEquals("user_code=123456", req.getURL().getQuery());
         OAuth2DeviceAuthenticationRequest messageParsedParsed = OAuth2DeviceAuthenticationRequest.parse(req);
         Assert.assertEquals("123456", messageParsedParsed.getUserCode());
-        Assert.assertEquals("http://example.com", messageParsedParsed.getEndpointURI().toString());
+        Assert.assertEquals("example.com", messageParsedParsed.getEndpointURI().getHost());
+        Assert.assertEquals("http", messageParsedParsed.getEndpointURI().getScheme());
     }
 
 }
