@@ -6,7 +6,7 @@
   <parent>
     <groupId>fi.csc.shibboleth.plugin.oauth2.devicegrant</groupId>
     <artifactId>idp-plugin-oauth2-devicegrant</artifactId>
-    <version>0.9.3</version>
+    <version>0.9.3-tuda.1</version>
   </parent>
   <name>Shibboleth IdP :: Plugins :: OAuth 2.0 Device Authorization Grant API</name>
   <description>OAuth 2.0 Device Authorization Grant plugin API.</description>

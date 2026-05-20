@@ -7,7 +7,7 @@
   <description>An IdP plugin implementing OAuth 2.0 Device Authorization Grant.</description>
   <groupId>fi.csc.shibboleth.plugin.oauth2.devicegrant</groupId>
   <artifactId>idp-plugin-oauth2-devicegrant</artifactId>
-  <version>0.9.3</version>
+  <version>0.9.3-tuda.1</version>
   <packaging>pom</packaging>
   <properties>
     <maven.compiler.source>17</maven.compiler.source>

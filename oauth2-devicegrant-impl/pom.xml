@@ -6,7 +6,7 @@
   <parent>
     <groupId>fi.csc.shibboleth.plugin.oauth2.devicegrant</groupId>
     <artifactId>idp-plugin-oauth2-devicegrant</artifactId>
-    <version>0.9.3</version>
+    <version>0.9.3-tuda.1</version>
   </parent>
   <name>Shibboleth IdP :: Plugins :: OAuth 2.0 Device Authorization Grant Implementation</name>
   <description>OAuth 2.0 Device Authorization Grant plugin implementation.</description>
@@ -22,7 +22,7 @@
       <artifactId>oauth2-devicegrant-api</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
-    </dependency>      
+    </dependency>
     <!-- provided dependencies -->
     <dependency>
       <groupId>${slf4j.groupId}</groupId>
