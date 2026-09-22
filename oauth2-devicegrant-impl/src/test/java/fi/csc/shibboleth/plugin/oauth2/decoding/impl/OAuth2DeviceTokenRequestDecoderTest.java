@@ -44,6 +44,9 @@ public class OAuth2DeviceTokenRequestDecoderTest {
         httpRequest.addHeader("Content-Type", "application/x-www-form-urlencoded");
         httpRequest.setQueryString(
                 "client_id=123456&device_code=123456&grant_type=urn:ietf:params:oauth:grant-type:device_code");
+        httpRequest.setParameter("client_id", "123456");
+        httpRequest.setParameter("device_code", "123456");
+        httpRequest.setParameter("grant_type", "urn:ietf:params:oauth:grant-type:device_code");
         decoder = new OAuth2DeviceTokenRequestDecoder();
         decoder.setHttpServletRequestSupplier(new NonnullSupplier<>() {
             public HttpServletRequest get() {
@@ -64,6 +67,7 @@ public class OAuth2DeviceTokenRequestDecoderTest {
     @Test(expectedExceptions = MessageDecodingException.class)
     public void testInvalidRequestDecoding() throws MessageDecodingException {
         httpRequest.setQueryString("device_code=123456&grant_type=urn:ietf:params:oauth:grant-type:device_code");
+        httpRequest.removeParameter("client_id");
         decoder.decode();
     }
 
@@ -71,6 +75,7 @@ public class OAuth2DeviceTokenRequestDecoderTest {
     public void testClientInHeaders() throws MessageDecodingException, ComponentInitializationException {
         httpRequest.addHeader("Authorization", "Basic dGVzdDp0ZXN0");
         httpRequest.setQueryString("device_code=123456&grant_type=urn:ietf:params:oauth:grant-type:device_code");
+        httpRequest.removeParameter("client_id");
         decoder = new OAuth2DeviceTokenRequestDecoder();
         decoder.setHttpServletRequestSupplier(new NonnullSupplier<>() {
             public HttpServletRequest get() {

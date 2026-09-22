@@ -61,7 +61,7 @@ public class OAuth2DeviceAuthenticationRequestTest {
         Assert.assertEquals(Method.GET, req.getMethod());
         Assert.assertEquals("http", req.getURL().getProtocol());
         Assert.assertEquals("example.com", req.getURL().getHost());
-        Assert.assertEquals("user_code=123456", req.getURL().getQuery());
+        Assert.assertEquals("user_code=123456", req.getQuery());
         OAuth2DeviceAuthenticationRequest messageParsedParsed = OAuth2DeviceAuthenticationRequest.parse(req);
         Assert.assertEquals("123456", messageParsedParsed.getUserCode());
         Assert.assertEquals("example.com", messageParsedParsed.getEndpointURI().getHost());

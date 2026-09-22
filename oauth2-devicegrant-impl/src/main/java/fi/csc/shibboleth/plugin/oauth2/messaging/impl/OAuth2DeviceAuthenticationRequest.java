@@ -21,6 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,8 +90,8 @@ public class OAuth2DeviceAuthenticationRequest extends AbstractRequest {
         Map<String, List<String>> params = new HashMap<>();
         params.putAll(URLUtils.parseParameters(getEndpointURI().getQuery()));
         if (user_code != null) {
-            params.put("user_code", Arrays.asList(user_code));
-            httpRequest.appendQueryParameters(params);
+            params.put("user_code", Collections.singletonList(user_code));
+            httpRequest.setQuery(URLUtils.serializeParameters(params));
         }
         return httpRequest;
     }
@@ -131,7 +132,7 @@ public class OAuth2DeviceAuthenticationRequest extends AbstractRequest {
      */
     public static OAuth2DeviceAuthenticationRequest parse(final HTTPRequest httpRequest) throws ParseException {
 
-        String query = httpRequest.getURL().getQuery();
+        String query = httpRequest.getQuery();
         URI endpointURI;
         try {
             endpointURI = httpRequest.getURL().toURI();

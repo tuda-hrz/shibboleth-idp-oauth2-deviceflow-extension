@@ -38,6 +38,7 @@ import com.nimbusds.oauth2.sdk.http.HTTPRequest;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.util.MultivaluedMapUtils;
 import com.nimbusds.oauth2.sdk.util.StringUtils;
+import com.nimbusds.oauth2.sdk.util.URLUtils;
 
 /**
  * Class implementing Device Access Token Request message as described in
@@ -144,7 +145,7 @@ public class OAuth2DeviceTokenRequest extends AbstractOptionallyIdentifiedReques
         }
         params.put("grant_type", Collections.singletonList(grantType));
         params.put("device_code", Collections.singletonList(deviceCode));
-        httpRequest.appendQueryParameters(params);
+        httpRequest.setQuery(URLUtils.serializeParameters(params));
         if (getClientAuthentication() != null) {
             getClientAuthentication().applyTo(httpRequest);
         }
@@ -168,7 +169,7 @@ public class OAuth2DeviceTokenRequest extends AbstractOptionallyIdentifiedReques
             throw new ParseException(e.getMessage(),
                     OAuth2Error.INVALID_REQUEST.appendDescription(": " + e.getMessage()));
         }
-        Map<String, List<String>> params = httpRequest.getQueryStringParameters();
+        Map<String, List<String>> params = httpRequest.getQueryParameters();
         if (clientAuth instanceof ClientSecretBasic) {
             if (StringUtils.isNotBlank(MultivaluedMapUtils.getFirstValue(params, "client_assertion"))
                     || StringUtils.isNotBlank(MultivaluedMapUtils.getFirstValue(params, "client_assertion_type"))) {
