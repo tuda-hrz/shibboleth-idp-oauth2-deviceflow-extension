@@ -83,8 +83,8 @@ public class OAuth2DeviceTokenRequestTest {
         Assert.assertEquals(Method.POST, req.getMethod());
         Assert.assertEquals("http", req.getURL().getProtocol());
         Assert.assertEquals("example.com", req.getURL().getHost());
-        Assert.assertTrue(req.getURL().getQuery().contains("device_code=123456"));
-        Assert.assertTrue(req.getURL().getQuery()
+        Assert.assertTrue(req.getQuery().contains("device_code=123456"));
+        Assert.assertTrue(req.getQuery()
                 .contains("grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code&device_code"));;
         OAuth2DeviceTokenRequest messageParsed = OAuth2DeviceTokenRequest.parse(req);
         Assert.assertEquals("clientID", messageParsed.getClientID().getValue());
@@ -117,8 +117,8 @@ public class OAuth2DeviceTokenRequestTest {
         Assert.assertEquals(Method.POST, req.getMethod());
         Assert.assertEquals("http", req.getURL().getProtocol());
         Assert.assertEquals("example.com", req.getURL().getHost());
-        Assert.assertTrue(req.getURL().getQuery().contains("device_code=123456"));
-        Assert.assertTrue(req.getURL().getQuery()
+        Assert.assertTrue(req.getQuery().contains("device_code=123456"));
+        Assert.assertTrue(req.getQuery()
                 .contains("grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code&device_code"));;
         Assert.assertNotNull(req.getHeaderValue("Authorization"));
         OAuth2DeviceTokenRequest messageParsed = OAuth2DeviceTokenRequest.parse(req);

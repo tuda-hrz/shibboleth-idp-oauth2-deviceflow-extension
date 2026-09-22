@@ -45,6 +45,8 @@ public class OAuth2DeviceAuthorizationRequestDecoderTest {
         httpRequest.setMethod("POST");
         httpRequest.addHeader("Content-Type", "application/x-www-form-urlencoded");
         httpRequest.setQueryString("scope=value&client_id=123456");
+        httpRequest.setParameter("scope", "value");
+        httpRequest.setParameter("client_id", "123456");
         decoder.setHttpServletRequestSupplier(new NonnullSupplier<>() {
             public HttpServletRequest get() {
                 return httpRequest;
@@ -67,6 +69,7 @@ public class OAuth2DeviceAuthorizationRequestDecoderTest {
     @Test(expectedExceptions = MessageDecodingException.class)
     public void testInvalidRequestDecoding() throws MessageDecodingException {
         httpRequest.setQueryString("scope=value");
+        httpRequest.removeParameter("client_id");
         decoder.decode();
     }
 
@@ -74,6 +77,7 @@ public class OAuth2DeviceAuthorizationRequestDecoderTest {
     public void testClientInHeaders() throws MessageDecodingException, ComponentInitializationException {
         httpRequest.addHeader("Authorization", "Basic dGVzdDp0ZXN0");
         httpRequest.setQueryString("scope=value");
+        httpRequest.removeParameter("client_id");
         decoder = new OAuth2DeviceAuthorizationRequestDecoder();
         decoder.setHttpServletRequestSupplier(new NonnullSupplier<>() {
             public HttpServletRequest get() {

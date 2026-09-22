@@ -42,6 +42,7 @@ import com.nimbusds.oauth2.sdk.http.HTTPRequest;
 import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.util.MultivaluedMapUtils;
 import com.nimbusds.oauth2.sdk.util.StringUtils;
+import com.nimbusds.oauth2.sdk.util.URLUtils;
 
 import com.nimbusds.openid.connect.sdk.claims.ACR;
 
@@ -144,7 +145,7 @@ public class OAuth2DeviceAuthorizationRequest extends AbstractOptionallyIdentifi
         if (scope != null && !scope.isEmpty()) {
             params.put("scope", Collections.singletonList(scope.toString()));
         }
-        httpRequest.appendQueryParameters(params);
+        httpRequest.setQuery(URLUtils.serializeParameters(params));
         if (getClientAuthentication() != null) {
             getClientAuthentication().applyTo(httpRequest);
         }
@@ -168,7 +169,7 @@ public class OAuth2DeviceAuthorizationRequest extends AbstractOptionallyIdentifi
             throw new ParseException(e.getMessage(),
                     OAuth2Error.INVALID_REQUEST.appendDescription(": " + e.getMessage()));
         }
-        Map<String, List<String>> params = httpRequest.getQueryStringParameters();
+        Map<String, List<String>> params = httpRequest.getQueryParameters();
         if (clientAuth instanceof ClientSecretBasic) {
             if (StringUtils.isNotBlank(MultivaluedMapUtils.getFirstValue(params, "client_assertion"))
                     || StringUtils.isNotBlank(MultivaluedMapUtils.getFirstValue(params, "client_assertion_type"))) {

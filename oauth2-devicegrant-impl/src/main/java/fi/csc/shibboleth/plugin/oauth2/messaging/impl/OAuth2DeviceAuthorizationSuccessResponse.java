@@ -203,7 +203,7 @@ public class OAuth2DeviceAuthorizationSuccessResponse implements SuccessResponse
         httpResponse.setEntityContentType(ContentType.APPLICATION_JSON);
         httpResponse.setCacheControl("no-store");
         httpResponse.setPragma("no-cache");
-        httpResponse.setBody(toJSONObject().toString());
+        httpResponse.setContent(toJSONObject().toString());
         return httpResponse;
     }
 

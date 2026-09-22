@@ -76,9 +76,9 @@ public class OAuth2DeviceAuthorizationRequestTest {
         Assert.assertEquals(Method.POST, req.getMethod());
         Assert.assertEquals("http", req.getURL().getProtocol());
         Assert.assertEquals("example.com", req.getURL().getHost());
-        Assert.assertTrue(req.getURL().getQuery().contains("client_id=clientID"));
-        Assert.assertTrue(req.getURL().getQuery().contains("scope=device"));
-        Assert.assertTrue(req.getURL().getQuery().contains("acr_values=https%3A%2F%2Frefeds"));
+        Assert.assertTrue(req.getQuery().contains("client_id=clientID"));
+        Assert.assertTrue(req.getQuery().contains("scope=device"));
+        Assert.assertTrue(req.getQuery().contains("acr_values=https%3A%2F%2Frefeds"));
         OAuth2DeviceAuthorizationRequest messageParsed = OAuth2DeviceAuthorizationRequest.parse(req);
         Assert.assertEquals("clientID", messageParsed.getClientID().getValue());
         Assert.assertEquals("device", messageParsed.getScope().toString());
@@ -109,8 +109,8 @@ public class OAuth2DeviceAuthorizationRequestTest {
         Assert.assertEquals(Method.POST, req.getMethod());
         Assert.assertEquals("http", req.getURL().getProtocol());
         Assert.assertEquals("example.com", req.getURL().getHost());
-        Assert.assertFalse(req.getURL().getQuery().contains("client_id=clientID"));
-        Assert.assertTrue(req.getURL().getQuery().contains("scope=device"));
+        Assert.assertFalse(req.getQuery().contains("client_id=clientID"));
+        Assert.assertTrue(req.getQuery().contains("scope=device"));
         Assert.assertNotNull(req.getHeaderValue("Authorization"));
         OAuth2DeviceAuthorizationRequest messageParsed = OAuth2DeviceAuthorizationRequest.parse(req);
         Assert.assertNull(messageParsed.getClientID());
